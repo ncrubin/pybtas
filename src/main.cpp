@@ -48,7 +48,7 @@ std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double c
     for (int j=0; j < shape[1]; j++) {
     for (int k=0; k < shape[2]; k++) {
       T3(i, j, k) = in_tensor(i, j, k);
-      std::cout << "(" << i << ", " << j << ", " << k << ") " << T3(i, j, k) << std::endl;
+      //std::cout << "(" << i << ", " << j << ", " << k << ") " << T3(i, j, k) << std::endl;
     }
     }
     }
@@ -58,40 +58,40 @@ std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double c
     std::vector<size_t> symm = {0, 0, 2};
     CP_ALS<DTensor, conv_class> A1(T3, symm);
     conv.set_norm(t3norm);
-    std::cout << "Norm " << t3norm << std::endl;
-    std::cout << "Calling facotrization" << std::endl;
+    //std::cout << "Norm " << t3norm << std::endl;
+    //std::cout << "Calling facotrization" << std::endl;
     double diff = A1.compute_rank(rank, conv);
     auto factors = A1.get_factor_matrices();
 
-    std::cout << "\nfac dims" << std::endl;
-    for (auto fac : factors){
-      if (fac.rank() == 2) {
-      std::cout << "Rank of tensor is 2 " << std::endl;
-      std::cout << fac.extent(0) << ", " << fac.extent(1) << std::endl;
-      for (int i =0; i  < fac.extent(0); ++i){
-        for(int j = 0; j < fac.extent(1); ++j){
-          std::cout  << "(" << i << ", " << j << ")\t" << fac(i, j) << std::endl;
-        }
-      }
-      std::cout << std::endl;
-    } else if (fac.rank() == 1) {
-      std::cout << "Rank of tensor is 1 " << std::endl;
-      std::cout << fac.extent(0) << std::endl;
-      for(int i=0; i < fac.extent(0); ++i){
-        std::cout << "(" << i << ") " << fac(i) << std::endl;
-      }
-    }
-  }
+    //std::cout << "\nfac dims" << std::endl;
+    //for (auto fac : factors){
+    //  if (fac.rank() == 2) {
+    //  std::cout << "Rank of tensor is 2 " << std::endl;
+    //  std::cout << fac.extent(0) << ", " << fac.extent(1) << std::endl;
+    //  for (int i =0; i  < fac.extent(0); ++i){
+    //    for(int j = 0; j < fac.extent(1); ++j){
+    //      std::cout  << "(" << i << ", " << j << ")\t" << fac(i, j) << std::endl;
+    //    }
+    //  }
+    //  std::cout << std::endl;
+    //} else if (fac.rank() == 1) {
+    //  std::cout << "Rank of tensor is 1 " << std::endl;
+    //  std::cout << fac.extent(0) << std::endl;
+    //  for(int i=0; i < fac.extent(0); ++i){
+    //    std::cout << "(" << i << ") " << fac(i) << std::endl;
+    //  }
+    //}
+    //}
 
-    auto reconstructed_tensor = A1.reconstruct();
+    // auto reconstructed_tensor = A1.reconstruct();
 
-    for (int i=0; i < shape[0]; i++) {
-    for (int j=0; j < shape[1]; j++) {
-    for (int k=0; k < shape[2]; k++) {
-      std::cout << "(" << i << ", " << j << ", " << k << ") " << T3(i, j, k) - reconstructed_tensor(i, j, k)  << std::endl;
-    }
-    }
-    }
+    // for (int i=0; i < shape[0]; i++) {
+    // for (int j=0; j < shape[1]; j++) {
+    // for (int k=0; k < shape[2]; k++) {
+    //   std::cout << "(" << i << ", " << j << ", " << k << ") " << T3(i, j, k) - reconstructed_tensor(i, j, k)  << std::endl;
+    // }
+    // }
+    // }
 
 
 
@@ -100,29 +100,29 @@ std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double c
 
     Eigen::MatrixXd scale_vec = Eigen::MatrixXd::Zero(factors[3].extent(0), 1);
 
-    std::cout << "PRINT BETA MAT" << std::endl;
-    for(int i = 0; i < factors[0].extent(0); i++){
-      for(int j = 0; j < factors[0].extent(1); j++){
-        beta(i, j) = factors[0](i, j);
-        std::cout << "(" << i << ", " << j << ") " << beta(i, j) << std::endl;
-      }
-    }
-    for(int i = 0; i < factors[2].extent(0); i++){
-      for(int j = 0; j < factors[2].extent(1); j++){
-        gamma(i, j) = factors[2](i, j);
-      }
-    }
-    std::cout << "scalar vector size " << factors[3].extent(0) << std::endl;
-    for(int i = 0; i < factors[3].extent(0); i++){
-        scale_vec(i, 0) = factors[3](i);
-        std::cout << factors[3](i) << std::endl;
-    }
+    //std::cout << "PRINT BETA MAT" << std::endl;
+    //for(int i = 0; i < factors[0].extent(0); i++){
+    //  for(int j = 0; j < factors[0].extent(1); j++){
+    //    beta(i, j) = factors[0](i, j);
+    //    std::cout << "(" << i << ", " << j << ") " << beta(i, j) << std::endl;
+    //  }
+    //}
+    //for(int i = 0; i < factors[2].extent(0); i++){
+    //  for(int j = 0; j < factors[2].extent(1); j++){
+    //    gamma(i, j) = factors[2](i, j);
+    //  }
+    //}
+    //std::cout << "scalar vector size " << factors[3].extent(0) << std::endl;
+    //for(int i = 0; i < factors[3].extent(0); i++){
+    //    scale_vec(i, 0) = factors[3](i);
+    //    std::cout << factors[3](i) << std::endl;
+    //}
 
     std::vector<Eigen::MatrixXd> matrices;
     matrices.push_back(beta);
     matrices.push_back(gamma);
     matrices.push_back(scale_vec);
-    std::cout << "Returning"<< std::endl;
+    //std::cout << "Returning"<< std::endl;
     return matrices;
 
 }
