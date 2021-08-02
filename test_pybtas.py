@@ -14,10 +14,12 @@ for i in range(2):
 
 A= np.ascontiguousarray(A)
 A = A + A.transpose(1, 0, 2)
+A_chol = np.zeros((4, 7))
 for i in range(2):
   for j in range(2):
     for k in range(7):
       print((i, j, k), A[i, j, k])
+      A_chol[i * 2 + j, k] = A[i, j, k]
 
 print()
 assert np.allclose(A, A.transpose(1, 0, 2))
@@ -38,3 +40,14 @@ for i in range(2):
       print((i, j, k), A[i, j, k] - Atest[i, j, k])
 
 assert np.allclose(Atest, A)
+
+print("From Cholesky matrix")
+beta, gamma, scale = pybtas.cp3_from_cholesky(A_chol, 7)
+Atest = np.einsum("ar,br,xr,r", beta, beta, gamma, scale.ravel())
+assert np.allclose(Atest, A)
+print("PASSED")
+
+B = np.arange(12).reshape((3, 4))
+print(B)
+Bt = pybtas.eigen_mat_return(B)
+print(Bt)
