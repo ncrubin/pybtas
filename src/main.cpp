@@ -29,7 +29,7 @@ using btas::CP_ALS;
 
 namespace py = pybind11;
 
-std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double conv_eps=1.0e-4) {
+std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double conv_eps=1.0e-4, bool random_start=false) {
     // request a buffer descriptor from Python
     py::buffer_info buffer_info = inArray.request();
 
@@ -60,7 +60,13 @@ std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double c
     conv.set_norm(t3norm);
     std::cout << "\tBTAS: Tensor-norm " << t3norm << std::endl;
     std::cout << "\tBTAS: Calling factorization" << std::endl;
-    double diff = A1.compute_rank(rank, conv);
+    if (random_start) {
+      std::cout << "\tBTAS: random start\n";
+      double diff = A1.compute_rank_random(rank, conv);
+    } else {
+      std::cout << "\tBTAS: HOSVD start\n";
+      double diff = A1.compute_rank(rank, conv);
+    }
     auto factors = A1.get_factor_matrices();
 
     //std::cout << "\nfac dims" << std::endl;
@@ -130,7 +136,7 @@ std::vector<Eigen::MatrixXd> cp3(py::array_t<double> inArray, int rank, double c
 }
 
 
-std::vector<Eigen::MatrixXd> cp3_from_cholesky(Eigen::MatrixXd inArray, int rank, double conv_eps=1.0e-4) {
+std::vector<Eigen::MatrixXd> cp3_from_cholesky(Eigen::MatrixXd inArray, int rank, double conv_eps=1.0e-4, bool random_start=false) {
     //inAarry is now an n^2 x n-chol matrix
     int numrows = inArray.rows();
     int numcols = inArray.cols();
@@ -179,7 +185,13 @@ std::vector<Eigen::MatrixXd> cp3_from_cholesky(Eigen::MatrixXd inArray, int rank
     conv.set_norm(t3norm);
     std::cout << "\tBTAS STOPPING NORM : " << t3norm << std::endl;
     std::cout << "\tBTAS: Calling factorization" << std::endl;
-    double diff = A1.compute_rank(rank, conv);
+    if (random_start) {
+      std::cout << "\tBTAS: random start\n";
+      double diff = A1.compute_rank_random(rank, conv);
+    } else {
+      std::cout << "\tBTAS: HOSVD start\n";
+      double diff = A1.compute_rank(rank, conv);
+    }
     auto factors = A1.get_factor_matrices();
 
     //std::cout << "\nfac dims" << std::endl;
@@ -268,9 +280,11 @@ Eigen::MatrixXd eigen_mat_return(Eigen::MatrixXd inArray) {
 
 PYBIND11_MODULE(pybtas, m) {
     m.def("cp3", &cp3, py::return_value_policy::move,
-        py::arg("inArray"), py::arg("rank"), py::arg("conv_eps")=1.0e-4);
+        py::arg("inArray"), py::arg("rank"), py::arg("conv_eps")=1.0e-4,
+        py::arg("random_start")=false);
     m.def("cp3_from_cholesky", &cp3_from_cholesky, py::return_value_policy::move,
-        py::arg("inArray"), py::arg("rank"), py::arg("conv_eps")=1.0e-4);
+        py::arg("inArray"), py::arg("rank"), py::arg("conv_eps")=1.0e-4,
+        py::arg("random_start")=false);
     m.def("eigen_mat_return", &eigen_mat_return, py::return_value_policy::move,
         py::arg("inArray"));
 }
