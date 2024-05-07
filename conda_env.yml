@@ -1,0 +1,16 @@
+name: pybtas
+channels:
+  - conda-forge
+dependencies:
+  - cxx-compiler
+  - c-compiler
+  - pip
+  - pybind11
+  - git
+  - openblas
+  - boost-cpp
+  - eigen
+  - lapackpp
+  - blaspp
+  - numpy
+  - pytest
