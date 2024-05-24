@@ -1,23 +1,27 @@
-cmake_minimum_required(VERSION 3.4...3.18)
+cmake_minimum_required(VERSION 3.24...3.29)
+set(CMAKE_CXX_STANDARD 17)
 project(pybtas)
 
-add_subdirectory(pybind11)
-pybind11_add_module(pybtas src/main.cpp)
+find_package(Python COMPONENTS Interpreter Development)
+find_package(pybind11 CONFIG)
 
-include_directories(~/opt/eigen-3.3.9)
+# use FetchContent to get BTAS source and targets
+include(FetchContent)
+FetchContent_Declare(BTAS
+  GIT_REPOSITORY https://github.com/valeevgroup/btas.git
+  GIT_TAG        master
+  OVERRIDE_FIND_PACKAGE
+)
+FetchContent_MakeAvailable(BTAS)
 
-find_package(BTAS
-        PATHS ~/opt/btas/)
-target_link_libraries(pybtas PUBLIC BTAS::BTAS)
+pybind11_add_module(_pybtas src/pybtas/main.cpp)
 
-
-# add_compile_definitions(BTAS_HAS_BLAS_LAPACK=1 LAPACK_COMPLEX_CPP=1 BTAS_HAS_BOOST_SERIALIZATION=1)
-# include_directories(~/opt/btas/include ~/opt/boost_1_76_0/)
-# target_link_directories(numpy3tensor PUBLIC  ~/opt/btas/lib)
-# target_link_libraries(numpy3tensor PUBLIC blaspp lapackpp)
-
-
+find_package(BTAS REQUIRED)
+find_package(Eigen3 REQUIRED)
+target_link_libraries(_pybtas PRIVATE Eigen3::Eigen BTAS)
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
-target_compile_definitions(pybtas PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+target_compile_definitions(_pybtas PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+
+install(TARGETS _pybtas DESTINATION .)
